@@ -4,32 +4,46 @@ const bcrypt = require('bcryptjs')
 exports.ragistration_insert = async(req,res) =>{
     try {
        const password = req.body.password;
-       const confirm_password = req.body.confirm_password
-       if(password === confirm_password)
-       {
-        const ragistration_insert = new ragistration_model({
-            f_name:req.body.f_name,
-            l_name:req.body.l_name,
-            mobile_number:req.body.mobile_number,
-            email:req.body.email,
-            password:bcrypt.hashSync(password,bcrypt.genSaltSync(8),null)
-        })
-         const saveData = await ragistration_insert.save();
-         console.log(saveData)   
-        
-         res.status(201).json({
-            message:"ragistration successfully",
-            status:201,
-            data:saveData
-         })
-       }
-       else
-       {
-        res.status(401).json({
-            message:"please,enter valid password...!",
-            status:401
-        })
-       }
+       const confirm_password = req.body.confirm_password;
+       const email = req.body.email;
+       const data = await ragistration_model.find({email})
+        if(!data[0]){
+            if(password === confirm_password)
+            {
+             
+             const ragistration_insert = new ragistration_model({
+                 f_name:req.body.f_name,
+                 l_name:req.body.l_name,
+                 mobile_number:req.body.mobile_number,
+                 email:req.body.email,
+                 password:bcrypt.hashSync(password,bcrypt.genSaltSync(8),null)
+             })
+               
+              const saveData = await ragistration_insert.save();
+              console.log(saveData)   
+             
+              res.status(201).json({
+                 message:"ragistration successfully",
+                 status:201,
+                 data:saveData
+              })
+            }
+            else
+            {
+             res.status(401).json({
+                 message:"please,enter valid password...!",
+                 status:401
+             })
+            }
+        }
+        else
+        {
+            res.status(422).json({
+                message:"already exist...!",
+                status:422
+            })
+        }
+      
 
     } catch (error) {
 
